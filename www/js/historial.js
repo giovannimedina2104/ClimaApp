@@ -5,19 +5,24 @@ var openRequest = window.indexedDB.open(databaseName, databaseVersion);
 
 
 // Función para eliminar un registro de la tabla y la base de datos
+// Función para eliminar un registro de la tabla y la base de datos
 function deleteRecord(key) {
-    var transaction = openRequest.result.transaction(["climas"], "readwrite");
-    var objectStore = transaction.objectStore("climas");
+    var confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este registro?");
 
-    var deleteRequest = objectStore.delete(key);
-    deleteRequest.onsuccess = function(event) {
-        console.log("Registro eliminado exitosamente");
-        // Actualizar la tabla después de eliminar el registro
-        location.reload();
-    };
-    deleteRequest.onerror = function(event) {
-        console.log("Error al eliminar el registro");
-    };
+    if (confirmDelete) {
+        var transaction = openRequest.result.transaction(["climas"], "readwrite");
+        var objectStore = transaction.objectStore("climas");
+
+        var deleteRequest = objectStore.delete(key);
+        deleteRequest.onsuccess = function(event) {
+            console.log("Registro eliminado exitosamente");
+            // Después de eliminar el registro, volvemos a mostrar los datos en la tabla
+            location.reload();
+        };
+        deleteRequest.onerror = function(event) {
+            console.log("Error al eliminar el registro");
+        };
+    }
 }
 
 // Función para mostrar los datos en la tabla HTML
@@ -60,6 +65,7 @@ function displayData() {
                 cursor.continue();
             } else {
                 console.log("No more entries!");
+               
             }
         };
     };
