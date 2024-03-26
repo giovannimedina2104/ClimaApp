@@ -1,27 +1,38 @@
 // Definir e inicializar la variable openRequest
 var databaseName = 'climaDB';
 var databaseVersion = 1;
-var openRequest = window.indexedDB.open(databaseName, databaseVersion);
-
+var openRequest;
 
 // Función para eliminar un registro de la tabla y la base de datos
 // Función para eliminar un registro de la tabla y la base de datos
 function deleteRecord(key) {
+
     var confirmDelete = window.confirm("¿Estás seguro de que deseas eliminar este registro?");
 
     if (confirmDelete) {
-        var transaction = openRequest.result.transaction(["climas"], "readwrite");
-        var objectStore = transaction.objectStore("climas");
 
-        var deleteRequest = objectStore.delete(key);
-        deleteRequest.onsuccess = function(event) {
-            console.log("Registro eliminado exitosamente");
-            // Después de eliminar el registro, volvemos a mostrar los datos en la tabla
-            location.reload();
+        openRequest = window.indexedDB.open(databaseName, databaseVersion);
+
+        openRequest.onerror = function (event) {
+            console.log(openRequest.errorCode);
         };
-        deleteRequest.onerror = function(event) {
-            console.log("Error al eliminar el registro");
+        openRequest.onsuccess = function (event) {
+            // Database is open and initialized - we're good to proceed.
+
+            var transaction = openRequest.result.transaction(["climas"], "readwrite");
+            var objectStore = transaction.objectStore("climas");
+
+            var deleteRequest = objectStore.delete(key);
+            deleteRequest.onsuccess = function(event) {
+                console.log("Registro eliminado exitosamente");
+                // Después de eliminar el registro, volvemos a mostrar los datos en la tabla
+                location.reload();
+            };
+            deleteRequest.onerror = function(event) {
+                console.log("Error al eliminar el registro");
+            };
         };
+        
     }
 }
 
